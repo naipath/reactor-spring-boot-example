@@ -1,0 +1,4 @@
+spring:
+  reactor:
+    stacktrace-mode:
+      enabled: true
