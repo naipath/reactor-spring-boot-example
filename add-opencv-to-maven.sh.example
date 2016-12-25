@@ -1,0 +1,8 @@
+#!/bin/bash
+mvn install:install-file \
+   -Dfile=<path-to-file> \
+   -DgroupId=org.opencv \
+   -DartifactId=opencv \
+   -Dversion=2.4.13.2 \
+   -Dpackaging=jar \
+   -DgeneratePom=true

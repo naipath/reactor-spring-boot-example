@@ -1,5 +1,6 @@
 package nl.ordina;
 
+import org.opencv.core.Core;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
@@ -12,6 +13,11 @@ import org.springframework.boot.context.properties.EnableConfigurationProperties
 @EnableConfigurationProperties({MongoProperties.class})
 @EnableAutoConfiguration(exclude={MongoAutoConfiguration.class, MongoDataAutoConfiguration.class})
 public class Application {
+
+    static{ System.loadLibrary(Core.NATIVE_LIBRARY_NAME); }
+
+
+
     public static void main(String[] args) {
         SpringApplication.run(Application.class, args);
     }
