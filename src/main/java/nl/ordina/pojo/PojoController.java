@@ -1,11 +1,12 @@
 package nl.ordina.pojo;
 
 import lombok.AllArgsConstructor;
+import lombok.extern.java.Log;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.*;
 import reactor.core.publisher.Mono;
 
-@Slf4j
+@Log
 @RestController
 @AllArgsConstructor
 @RequestMapping(path = "/pojo")
@@ -16,10 +17,9 @@ public class PojoController {
     @GetMapping("/{id}")
     public Mono<Pojo> get(@PathVariable String id) {
         return repository.findOne(id)
-            .doOnError(e -> log.error(e.getMessage()))
-            .doOnSuccess(pojo -> log.info("found pojo with id: {}", pojo.getId()))
-            .doOnCancel(() -> log.warn("request cancelled"));
-
+                .doOnError(e -> { log.severe(e.getMessage()); } )
+                .doOnSuccess(pojo -> log.severe("found pojo with id: {}" + pojo.getId()))
+                .doOnCancel( () -> { log.severe("request cancelled");});
     }
 
     @PostMapping

@@ -1,27 +1,32 @@
 package nl.ordina.whois;
 
+import nl.ordina.web.client.AsyncGet;
+import org.reactivestreams.Publisher;
+import org.reactivestreams.Subscriber;
+import org.reactivestreams.Subscription;
 import org.springframework.http.HttpEntity;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.AsyncRestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 import reactor.core.publisher.Mono;
+import reactor.core.publisher.MonoSource;
 
 import java.net.URI;
 import java.util.List;
-
-import static net.javacrumbs.futureconverter.springjava.FutureConverter.toCompletableFuture;
+import java.util.concurrent.Callable;
+import java.util.concurrent.CompletableFuture;
+import java.util.function.Consumer;
+import java.util.function.Supplier;
 
 @Service
 class WhoisService {
 
-    private AsyncRestTemplate asyncRestTemplate = new AsyncRestTemplate();
+    private AsyncGet<Whois> whoisRequest = new AsyncGet<>(Whois.class);
 
     Mono<List<Contact>> get(String domain) {
         URI uri = createBasicUri().queryParam("domain", domain).build().toUri();
-
-        return Mono.fromFuture(toCompletableFuture(asyncRestTemplate.getForEntity(uri, Whois.class)))
-            .map(HttpEntity::getBody)
-            .map(Whois::getContacts);
+        return whoisRequest.get(uri).map(Whois::getContacts);
     }
 
     private UriComponentsBuilder createBasicUri() {
