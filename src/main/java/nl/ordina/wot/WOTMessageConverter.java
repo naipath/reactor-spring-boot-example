@@ -29,9 +29,6 @@ import java.util.List;
 
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
-/**
- * Created by steven on 19-01-17.
- */
 public class WOTMessageConverter implements HttpMessageConverter<Object> {
 
     private JsonFactory factory = new JsonFactory();
@@ -67,8 +64,8 @@ public class WOTMessageConverter implements HttpMessageConverter<Object> {
             Iterator<String> fieldNames = data.fieldNames();
             while(fieldNames.hasNext()) {
                 String vehicleId = fieldNames.next();
-                node.get(vehicleId);
-                Vehicle vehicle = objectMapper.treeToValue(data.get(vehicleId), Vehicle.class);
+                JsonNode vehicleNode = data.get(vehicleId);
+                Vehicle vehicle = objectMapper.treeToValue(vehicleNode, Vehicle.class);
                 vehicles.getData().put(vehicleId, vehicle);
             }
 

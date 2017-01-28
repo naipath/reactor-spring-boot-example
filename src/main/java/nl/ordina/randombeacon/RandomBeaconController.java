@@ -1,5 +1,6 @@
 package nl.ordina.randombeacon;
 
+import gov.nist.beacon.record._0.Record;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
@@ -17,6 +18,12 @@ public class RandomBeaconController {
 
     @GetMapping
     public Mono<String> last() {
-        return service.last();
+        return service.last()
+                .map(Record::getOutputValue)
+                .doOnError(e -> e.printStackTrace())
+                .doOnCancel(() -> {
+                    System.out.println("Get randombeacon canceled");
+                });
+
     }
 }

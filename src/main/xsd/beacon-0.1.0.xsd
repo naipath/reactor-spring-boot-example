@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<xs:schema
+  xmlns="http://beacon.nist.gov/record/0.1/"
+  xmlns:xs="http://www.w3.org/2001/XMLSchema"
+  targetNamespace="http://beacon.nist.gov/record/0.1/" 
+  elementFormDefault="qualified"
+  attributeFormDefault="unqualified" version="0.1.0">
+  
+  <xs:element name="record" type="recordType">
+    <xs:annotation>
+      <xs:documentation>A single record instance, the root of the response.</xs:documentation>
+    </xs:annotation>
+  </xs:element>
+
+  <xs:complexType name="recordType">
+    <xs:annotation>
+      <xs:documentation>A type for a single record.</xs:documentation>
+    </xs:annotation>
+    <xs:sequence>
+      <xs:element name="version" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>A simple version string, e.g. “0.1.0”</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="frequency" type="xs:int">
+        <xs:annotation>
+          <xs:documentation>The time interval, in seconds, between expected records</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="timeStamp" type="xs:long">
+        <xs:annotation>
+          <xs:documentation>The time the seed value was generated as the number of seconds since January 1, 1970</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="seedValue" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>A seed value represented as a 64 byte (512-bit) hex string value</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="previousOutputValue" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>The SHA-512 hash value for the previous record - 64 byte hex string</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="signatureValue" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>A digital signature (RSA) computed over (in order):
+            version, frequency, timeStamp, seedValue, previousHashValue, errorCode
+            Note: Except for version, the hash is on the byte representations and
+            not the string representations of the data values
+          </xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="outputValue" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>The SHA-512 hash of the signatureValue as a 64 byte hex string</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+      <xs:element name="statusCode" type="xs:string">
+        <xs:annotation>
+          <xs:documentation>The status code value:
+            0 - Chain intact, values all good
+            1 - Start of a new chain of values, previous hash value will be all zeroes
+            2 - Time between values is greater than the frequency, but the chain is still intact</xs:documentation>
+        </xs:annotation>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+</xs:schema>

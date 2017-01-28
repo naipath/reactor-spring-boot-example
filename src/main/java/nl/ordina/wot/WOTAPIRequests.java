@@ -19,7 +19,6 @@ public class WOTAPIRequests {
     }
 
 
-
     private UriComponentsBuilder uriBuilder(String path) {
         return UriComponentsBuilder
                 .fromHttpUrl("https://api.worldoftanks.ru")

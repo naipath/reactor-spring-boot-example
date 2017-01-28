@@ -11,9 +11,6 @@ import reactor.core.publisher.Mono;
 
 import java.util.List;
 
-/**
- * Created by steven on 06-01-17.
- */
 @Service
 public class WOTService {
 

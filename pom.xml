@@ -29,10 +29,7 @@
 			<groupId>org.springframework.boot.experimental</groupId>
 			<artifactId>spring-boot-starter-web-reactive</artifactId>
 		</dependency>
-		<dependency>
-			<groupId>org.springframework.cloud</groupId>
-			<artifactId>spring-cloud-starter-hystrix</artifactId>
-		</dependency>
+
 		<dependency>
 			<groupId>org.springframework.data</groupId>
 			<artifactId>spring-data-commons</artifactId>
@@ -87,6 +84,29 @@
 
 	<build>
 		<plugins>
+			<plugin>
+				<groupId>org.codehaus.mojo</groupId>
+				<artifactId>jaxb2-maven-plugin</artifactId>
+				<version>2.2</version>
+				<executions>
+					<execution>
+						<id>xjc</id>
+						<goals>
+							<goal>xjc</goal>
+						</goals>
+						<configuration>
+							<!--<sources>-->
+								<!--<source>${project.basedir}/src/main/resources/beacon-0.1.0.xsd</source>-->
+
+							<!--</sources>-->
+							<!--<bindingIncludes>-->
+								<!--<include>${project.basedir}/src/main/resources/beacon-0.1.0.xjb</include>-->
+							<!--</bindingIncludes>-->
+							<extension>true</extension>
+						</configuration>
+					</execution>
+				</executions>
+			</plugin>
 			<plugin>
 				<groupId>org.springframework.boot</groupId>
 				<artifactId>spring-boot-maven-plugin</artifactId>
