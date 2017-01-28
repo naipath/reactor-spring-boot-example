@@ -30,7 +30,7 @@ public class WebcamService {
     private WebStreamUDP webStream;
 
 
-    @PostConstruct
+//    @PostConstruct
     public void initialize() {
         webStream = new WebStreamUDP();
         webStream.init();

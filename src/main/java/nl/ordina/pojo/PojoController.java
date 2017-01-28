@@ -18,8 +18,7 @@ public class PojoController {
     public Mono<Pojo> get(@PathVariable String id) {
         return repository.findOne(id)
                 .doOnError(e -> { log.severe(e.getMessage()); } )
-                .doOnSuccess(pojo -> log.severe("found pojo with id: {}" + pojo.getId()))
-                .doOnCancel( () -> { log.severe("request cancelled");});
+                .doOnSuccess(pojo -> log.info("found pojo with id: " + pojo.getId()));
     }
 
     @PostMapping

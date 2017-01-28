@@ -1,11 +1,13 @@
 package nl.ordina.randombeacon;
 
 import gov.nist.beacon.record._0.Record;
+import lombok.extern.java.Log;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import reactor.core.publisher.Mono;
 
+@Log
 @RestController
 @RequestMapping("randombeacon")
 public class RandomBeaconController {
@@ -19,11 +21,8 @@ public class RandomBeaconController {
     @GetMapping
     public Mono<String> last() {
         return service.last()
-                .map(Record::getOutputValue)
-                .doOnError(e -> e.printStackTrace())
-                .doOnCancel(() -> {
-                    System.out.println("Get randombeacon canceled");
-                });
-
+                .doOnSuccess(record -> log.info("found beacon with timestamp: " + record.getTimeStamp()))
+                .doOnError(e -> { log.severe(e.getMessage()); } )
+                .map(Record::getOutputValue);
     }
 }

@@ -10,9 +10,6 @@ import reactor.core.publisher.Mono;
 import java.net.URI;
 import java.util.concurrent.CompletableFuture;
 
-/**
- * Created by steven on 07-01-17.
- */
 public class AsyncPost<T,R> {
 
     private final AsyncRestTemplate asyncRestTemplate = new AsyncRestTemplate();
