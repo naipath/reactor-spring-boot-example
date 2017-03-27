@@ -21,49 +21,32 @@ import static org.bytedeco.javacpp.swscale.*;
  * Created by steven on 02-01-17.
  */
 @Component
-public class WebStreamUDP implements WebStream<Mat> {
+public class WebStreamUDP {
 
-    final String filename = "udp://0.0.0.0:12345";
-    //        final String filename = "/tmp/tst.flv";
-    final int bitRate = 2 * 1024 * 1024;
+    private static final String filename = "udp://0.0.0.0:12345";
+    private static final int bitRate = 2 * 1024 * 1024;
+    private static final int width = 640;
+    private static final int height = 480;
+    private static final int duration = 10;
+    private static final int sws_flags = SWS_BICUBIC;
+    private static final int pixelFormatVideoStream = AV_PIX_FMT_YUV420P;//AV_PIX_FMT_YUV420P;
+    private static final int pixelFormatOpenCVImage = AV_PIX_FMT_BGR24;
+    private static final int codec = AV_CODEC_ID_MPEG2VIDEO;
+    private static final String ext = "mpegts";
 
-    final int width = 640;
-    final int height = 480;
-    final int duration = 10;
-    final int sws_flags = SWS_BICUBIC;
-    final int pixelFormatVideoStream = AV_PIX_FMT_YUV420P;//AV_PIX_FMT_YUV420P;
-    final int pixelFormatOpenCVImage = AV_PIX_FMT_BGR24;
-//    final int pixelFormat = AV_PIX_FMT_0RGB;//AV_PIX_FMT_YUV420P;
-//    final int codec = AV_CODEC_ID_H264;
-    final int codec = AV_CODEC_ID_MPEG2VIDEO;
-//    final int codec = AV_CODEC_ID_BFI;
-//    final int codec = AV_CODEC_ID_H265;
-//    final int codec = AV_CODEC_ID_RAWVIDEO;
-
-
-    final String ext = "mpegts";
-//    final String ext = "rawvideo";
-//    final String ext = "yuv4mpegpipe";
-
-//    final String ext = "h264_videotoolbox";
-    final avutil.AVRational timbase;
-
-
+    private final avutil.AVRational timbase;
     private AVOutputFormat outputFormat;
     private AVFormatContext avFormatContext;
     private AVCodec videoCodec;
     private AVCodecContext avCodecContext;
     private AVStream stream;
-    avutil.AVDictionary options = new avutil.AVDictionary();
+    private avutil.AVDictionary options = new avutil.AVDictionary();
     private AVFrame openCVImageFrame;
     private AVFrame videoFrame;
     private AVIOContext avioContext;
-
     private final int imageBufferOpenCVSize = width * height * 3;
     private final byte[] imageByteArrayOpenCV = new byte[(int) imageBufferOpenCVSize];
-
     private swscale.SwsContext imgConvertCtx = null;
-
 
     public WebStreamUDP() {
         timbase = new avutil.AVRational();
@@ -71,27 +54,16 @@ public class WebStreamUDP implements WebStream<Mat> {
         timbase.den(15);
     }
 
-    @Override
     public void init() {
-
         int ret;
-
         av_register_all();
         avformat_network_init();
-//
-//        //set output format
         outputFormat = av_guess_format(ext, null, null);
-//
-//        //alloc outputmedia context
         avFormatContext = new avformat.AVFormatContext();
         avformat_alloc_output_context2(avFormatContext, outputFormat, ext, filename);
-//
-//        //add video stream
         videoCodec = avcodec_find_encoder(codec);
-//
         avCodecContext = avcodec_alloc_context3(videoCodec);
         stream = avformat_new_stream(avFormatContext, videoCodec);
-
         avCodecContext.time_base(timbase);
         avCodecContext.gop_size(10);
         avCodecContext.max_b_frames(1);
@@ -100,53 +72,36 @@ public class WebStreamUDP implements WebStream<Mat> {
         avCodecContext.height(height);
         avCodecContext.bit_rate(bitRate);
         avCodecContext.framerate(timbase);
-
         stream.codec(avCodecContext);
         stream.time_base(timbase);
         stream.duration(duration);
 
-
-//        if ( (avFormatContext.flags() & AVFMT_GLOBALHEADER) != 0) {
-//            avFormatContext.flags( avFormatContext.flags() | AV_CODEC_FLAG_GLOBAL_HEADER);
-//        }
-
-//        av_set_options_string(options, "preset=superfast;profile=baseline;tune=zerolatency;vbv-maxrate=5000;vbv-bufsize=1;slice-max-size=1500;keyint=60", "=", ";");
         av_set_options_string(options, "preset=superfast;profile=baseline;tune=zerolatency;", "=", ";");
-
-        //h264 options
-//        av_set_options_string(options, "x264opts crf=20:vbv-maxrate=3000:vbv-bufsize=50:intra-refresh=1:slice-max-size=1500:keyint=30:ref=1"," ", ";");
-
-//        //open video
         ret = avcodec_open2(avCodecContext, videoCodec, options);
 //
 //        //alloc frame
-        openCVImageFrame = av_frame_alloc();
-        if(openCVImageFrame == null) {
-            System.out.println("Error create reusable frame");
-            return;
-        }
+        allocCVImageFrame();
         openCVImageFrame.width(width);
         openCVImageFrame.height(height);
         openCVImageFrame.format(pixelFormatOpenCVImage);
         openCVImageFrame.pts(0);
         ret = av_frame_get_buffer(openCVImageFrame, 32);
         if(ret < 0) {
-            System.err.println("Kan buffer niet alloceren");
+            throw new RuntimeException("Kan buffer niet alloceren");
         }
 
         videoFrame = av_frame_alloc();
         if(videoFrame == null) {
-//            //TODO: error handling
-            System.out.println("Error create reusable frame");
-            return;
+            throw new RuntimeException("Error create reusable frame");
         }
         videoFrame.width(width);
         videoFrame.height(height);
         videoFrame.format(pixelFormatVideoStream);
         videoFrame.pts(0);
+
         ret = av_frame_get_buffer(videoFrame, 32);
         if(ret < 0) {
-            System.err.println("Kan buffer niet alloceren");
+            throw new RuntimeException("Kan buffer niet alloceren");
         }
 //        //write format info
 //        //TODO: writes to stdout
@@ -174,20 +129,24 @@ public class WebStreamUDP implements WebStream<Mat> {
 
     }
 
-    @Override
+    private void allocCVImageFrame() {
+        openCVImageFrame = av_frame_alloc();
+        if(openCVImageFrame == null) {
+            throw new RuntimeException("Error create reusable frame");
+        }
+    }
+
     public void start() {
         //write header
         int ret;
         ret = avformat_write_header(avFormatContext, options);
     }
 
-    @Override
     public void stop() {
         av_write_trailer(avFormatContext);
     }
 
 
-    @Override
     public void record(Mat image) {
 
         copyImageToFrame(image, openCVImageFrame);
@@ -213,7 +172,6 @@ public class WebStreamUDP implements WebStream<Mat> {
             packet.dts(videoFrame.pts());
             packet.pts(videoFrame.pts());
             av_write_frame(avFormatContext, packet);
-            System.out.println("write frame - " + videoFrame.pts());
         }
         av_free_packet(packet);
     }
@@ -224,7 +182,6 @@ public class WebStreamUDP implements WebStream<Mat> {
         avpicture_fill(avPicture, imageByteArrayOpenCV, pixelFormatOpenCVImage, width, height);
     }
 
-    @Override
     public void close() throws IOException {
         sws_freeContext(imgConvertCtx);
         av_frame_free(openCVImageFrame);

@@ -19,10 +19,10 @@ public class RandomBeaconController {
     }
 
     @GetMapping
-    public Mono<String> last() {
+    public Mono<Record> last() {
         return service.last()
                 .doOnSuccess(record -> log.info("found beacon with timestamp: " + record.getTimeStamp()))
                 .doOnError(e -> { log.severe(e.getMessage()); } )
-                .map(Record::getOutputValue);
+                .doOnCancel(() -> log.warning("randombeacon cancelled"));
     }
 }

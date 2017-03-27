@@ -12,4 +12,9 @@ public class TestController {
     public Flux<Integer> testing(@PathVariable String id) {
         return Flux.just(id).map(String::length);
     }
+
+    @GetMapping("/test/http2")
+    public String http2() {
+        return "http2";
+    }
 }

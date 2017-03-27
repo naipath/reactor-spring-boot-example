@@ -21,12 +21,12 @@ import java.util.stream.Collectors;
 
 import static org.opencv.core.Core.bitwise_not;
 import static org.opencv.core.CvType.CV_64FC1;
+import static org.opencv.imgcodecs.Imgcodecs.imencode;
 import static org.opencv.imgproc.Imgproc.*;
 
 /**
  * Created by steven on 25-12-16.
  */
-@Component
 public class ImageFilters {
 
     private static final Scalar BLUE = new Scalar(0, 0, 255);
@@ -43,6 +43,15 @@ public class ImageFilters {
                 -2.0f, 0.0f, 2.0f,
                 -1.0f, 0.0f, 1.0f
         });
+    }
+
+    public Mat detectAndDrawFaces(Mat image) {
+        Mat grey = copy(image);
+        gray(grey);
+        MatOfRect faces = facedetection(grey);
+        List<Tuple2<Rect, MatOfRect>> facesAndEyes = eyedetection(grey, faces);
+        drawFaces(image, facesAndEyes);
+        return image;
     }
 
     public Mat resize640480(Mat image) {
@@ -136,7 +145,8 @@ public class ImageFilters {
         return SwingFXUtils.toFXImage(image, null);
     }
 
-    public BufferedImage matToBufferedImage(Mat frame) {
+
+    public static BufferedImage matToBufferedImage(Mat frame) {
         //Mat() to BufferedImage
         int type = 0;
         if (frame.channels() == 1) {
