@@ -1,0 +1,6 @@
+spring:
+  reactor:
+    stacktrace-mode:
+      enabled: true
+
+#spring.data.mongodb.database: tanks
