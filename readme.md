@@ -1,13 +1,9 @@
 # Reactor-Spring-Boot-Example
 
-This project is meant to demo some of the functionality of Reactor
- 
-You can run this project with:
-```bash
-mvn clean package spring-boot:run
-```
+This project is meant to demo some of the functionality of Reactor.
 
-To see results:
-```bash
-curl localhost:8080/test/somestringfortesting
-```
+There are 3 seperated projects:
+ - Playground: Simple spring-boot app meant for playing around, there are examples for restcontrollers, crudrepository and httpclient. 
+ - Face-recognition: Face recognition using opencv
+ - Imageviewer: Kafka client for the face-recognition
+ 
