@@ -3,4 +3,4 @@ spring:
     stacktrace-mode:
       enabled: true
 
-#spring.data.mongodb.database: tanks
+spring.data.mongodb.database: tanks

@@ -1,6 +1,6 @@
 # Reactor playground
 
-https://developers.wargaming.net/reference/na/wotb/encyclopedia/vehicles/?application_id=demo&r_realm=na
+Some data to experiment with, gotten by using the following url: `https://developers.wargaming.net/reference/na/wotb/encyclopedia/vehicles/?application_id=demo&r_realm=na` 
 
 ```
 {
